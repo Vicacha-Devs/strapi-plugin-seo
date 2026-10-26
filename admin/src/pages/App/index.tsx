@@ -1,19 +1,11 @@
-/**
- *
- * This component is the skeleton around the actual pages, and should only
- * contain code that should be seen on all pages. (e.g. navigation bar)
- *
- */
-
 import * as React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import {
   Page,
   private_AutoReloadOverlayBlockerProvider as AutoReloadOverlayBlockerProvider,
 } from '@strapi/strapi/admin';
-
-import { HomePage } from '../HomePage';
 import { pluginPermissions } from '../../permissions';
+import { HomePage } from '../HomePage';
 
 const App = () => {
   return (
@@ -28,4 +20,4 @@ const App = () => {
   );
 };
 
-export default App
+export default App;

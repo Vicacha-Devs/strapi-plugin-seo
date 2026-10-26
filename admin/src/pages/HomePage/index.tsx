@@ -1,20 +1,18 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-
 import { Box } from '@strapi/design-system';
 import { Information } from '@strapi/icons';
 import {
-  Page,
   ContentBox,
-  useFetchClient,
+  Page,
   private_useAutoReloadOverlayBlocker as useAutoReloadOverlayBlocker,
+  useFetchClient,
 } from '@strapi/strapi/admin';
-
-import { Main } from '../../components/HomePage/Main';
+import type { ContentTypesResponse } from '../../../../shared';
 import { Header } from '../../components/HomePage/Header';
-
-import { getTrad } from '../../utils/getTrad';
+import { Main } from '../../components/HomePage/Main';
 import { pluginId } from '../../pluginId';
+import { getTrad } from '../../utils/getTrad';
 
 export const HomePage = React.memo(() => {
   const { get, post } = useFetchClient();
@@ -24,35 +22,32 @@ export const HomePage = React.memo(() => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [shouldEffect, setShouldEffect] = React.useState(false);
 
-  const seoComponent = React.useRef(null);
-  const contentTypes = React.useRef(null);
+  const seoComponent = React.useRef<Record<string, unknown> | null>(null);
+  const contentTypes = React.useRef<ContentTypesResponse | null>(null);
 
   const fetchSeoComponent = async () => {
     try {
-      const { data } = await get(`/${pluginId}/component`);
-
+      const { data } = await get<Record<string, unknown> | null>(`/${pluginId}/component`);
       return data;
-    } catch (error) {
+    } catch {
       return null;
     }
   };
 
   const fetchContentTypes = async () => {
     try {
-      const { data } = await get(`/${pluginId}/content-types`);
-
+      const { data } = await get<ContentTypesResponse>(`/${pluginId}/content-types`);
       return data;
-    } catch (error) {
+    } catch {
       return null;
     }
   };
 
   const createSeoComponent = async () => {
     try {
-      const data = await post(`/${pluginId}/component`);
-
-      return data.json();
-    } catch (error) {
+      const { data } = await post<Record<string, unknown> | null>(`/${pluginId}/component`);
+      return data;
+    } catch {
       return null;
     }
   };
@@ -62,22 +57,21 @@ export const HomePage = React.memo(() => {
       seoComponent.current = await fetchSeoComponent();
       contentTypes.current = await fetchContentTypes();
 
-      const hasNoSeoComponent = !seoComponent.current || seoComponent.current.length === 0;
+      const hasNoSeoComponent =
+        !seoComponent.current || Object.keys(seoComponent.current).length === 0;
       if (hasNoSeoComponent) {
         try {
           lockAppWithAutoreload();
-
           await createSeoComponent();
         } catch (error) {
           console.log(error);
         } finally {
           unlockAppWithAutoreload();
-
           setShouldEffect(true);
         }
       }
     };
-    fetchData().then(() => {
+    void fetchData().then(() => {
       setIsLoading(false);
     });
   }, [shouldEffect]);
@@ -92,11 +86,11 @@ export const HomePage = React.memo(() => {
       <Box paddingLeft={8} paddingRight={8}>
         <ContentBox
           title={formatMessage({
-            id: 'Information',
+            id: getTrad('Information'),
             defaultMessage: 'Information',
           })}
           subtitle={formatMessage({
-            id: getTrad('HomePage.info.information'),
+            id: getTrad('SEOPage.info.information'),
             defaultMessage:
               "When adding your SEO component, make sure to name it 'seo' and to include it in the root of your Content-Type.",
           })}
