@@ -1,0 +1,17 @@
+{
+  "extends": "@strapi/typescript-utils/tsconfigs/server",
+  "compilerOptions": {
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "./src",
+    "./custom.d.ts",
+    "../shared"
+  ],
+  "exclude": [
+    "node_modules",
+    "../dist"
+  ]
+}
