@@ -1,6 +1,13 @@
 import * as React from 'react';
+import type { OpenGraphImage } from '../../../../../../../../shared';
 
-export const LinkedInOGPreview = ({ image, title, description }) => {
+interface LinkedInOGPreviewProps {
+  image: OpenGraphImage;
+  title: string;
+  description?: string;
+}
+
+export const LinkedInOGPreview = ({ image, title }: LinkedInOGPreviewProps) => {
   return (
     <div
       style={{
@@ -15,7 +22,6 @@ export const LinkedInOGPreview = ({ image, title, description }) => {
         marginBottom: '40px',
       }}
     >
-      {/* Image section */}
       <div
         style={{
           backgroundSize: 'cover',
@@ -39,7 +45,6 @@ export const LinkedInOGPreview = ({ image, title, description }) => {
         </div>
       </div>
 
-      {/* Content section */}
       <div
         style={{
           backgroundColor: '#ffffff',
@@ -48,7 +53,6 @@ export const LinkedInOGPreview = ({ image, title, description }) => {
           borderTop: '1px solid #ccd0d5',
         }}
       >
-        {/* Title */}
         <div
           style={{
             fontSize: '18px',
@@ -63,7 +67,6 @@ export const LinkedInOGPreview = ({ image, title, description }) => {
           {title.substring(0, 70)}
         </div>
 
-        {/* Site name */}
         <div
           style={{
             fontSize: '12px',

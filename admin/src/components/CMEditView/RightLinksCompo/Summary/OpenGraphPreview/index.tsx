@@ -1,24 +1,25 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-
 import { Badge, Box, EmptyStateLayout, Flex, Modal, Typography } from '@strapi/design-system';
-
-import { Illo } from '../../../../HomePage/Main/EmptyComponentLayout/illo';
-
+import type { OpenGraphData } from '../../../../../../../shared';
 import { getTrad } from '../../../../../utils/getTrad';
-import { FacebookOGPreview } from './Facebook/index';
-import { TwitterOGPreview } from './X/index';
-import { LinkedInOGPreview } from './LinkedIn/index';
+import { Illo } from '../../../../HomePage/Main/EmptyComponentLayout/illo';
+import { FacebookOGPreview } from './Facebook';
+import { LinkedInOGPreview } from './LinkedIn';
+import { TwitterOGPreview } from './X';
 
-export const OpenGraphPreview = ({ modifiedData }) => {
+interface OpenGraphPreviewProps {
+  modifiedData: Record<string, any>;
+}
+
+export const OpenGraphPreview = ({ modifiedData }: OpenGraphPreviewProps) => {
   const { formatMessage } = useIntl();
-
-  const { openGraph } = modifiedData?.seo;
+  const openGraph: OpenGraphData | undefined = modifiedData?.seo?.openGraph;
 
   return (
-    <Modal.Content labelledBy="title">
+    <Modal.Content>
       <Modal.Header>
-        <Typography fontWeight="bold" textColor="neutral800" as="h2" id="title">
+        <Typography fontWeight="bold" textColor="neutral800" tag="h2">
           {formatMessage({
             id: getTrad('Button.open-graph-preview'),
             defaultMessage: 'Open Graph Preview',
@@ -26,7 +27,7 @@ export const OpenGraphPreview = ({ modifiedData }) => {
         </Typography>
       </Modal.Header>
       <Modal.Body>
-        {openGraph['ogTitle'] && openGraph['ogDescription'] && openGraph['ogImage'] ? (
+        {openGraph?.ogTitle && openGraph?.ogDescription && openGraph?.ogImage ? (
           <>
             <Flex alignItems="left" direction="column" gap={2}>
               <Flex gap={1}>
@@ -36,9 +37,9 @@ export const OpenGraphPreview = ({ modifiedData }) => {
               </Flex>
             </Flex>
             <FacebookOGPreview
-              title={openGraph['ogTitle']}
-              description={openGraph['ogDescription']}
-              image={openGraph['ogImage']}
+              title={openGraph.ogTitle}
+              description={openGraph.ogDescription}
+              image={openGraph.ogImage}
             />
             <Flex alignItems="left" direction="column" gap={2}>
               <Flex gap={1}>
@@ -48,9 +49,9 @@ export const OpenGraphPreview = ({ modifiedData }) => {
               </Flex>
             </Flex>
             <TwitterOGPreview
-              title={openGraph['ogTitle']}
-              description={openGraph['ogDescription']}
-              image={openGraph['ogImage']}
+              title={openGraph.ogTitle}
+              description={openGraph.ogDescription}
+              image={openGraph.ogImage}
             />
             <Flex alignItems="left" direction="column" gap={2}>
               <Flex gap={1}>
@@ -60,9 +61,9 @@ export const OpenGraphPreview = ({ modifiedData }) => {
               </Flex>
             </Flex>
             <LinkedInOGPreview
-              title={openGraph['ogTitle']}
-              description={openGraph['ogDescription']}
-              image={openGraph['ogImage']}
+              title={openGraph.ogTitle}
+              description={openGraph.ogDescription}
+              image={openGraph.ogImage}
             />
           </>
         ) : (

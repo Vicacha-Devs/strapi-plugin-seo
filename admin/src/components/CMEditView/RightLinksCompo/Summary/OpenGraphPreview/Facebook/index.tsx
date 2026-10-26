@@ -1,6 +1,13 @@
 import * as React from 'react';
+import type { OpenGraphImage } from '../../../../../../../../shared';
 
-export const FacebookOGPreview = ({ image, title, description }) => {
+interface FacebookOGPreviewProps {
+  image: OpenGraphImage;
+  title: string;
+  description: string;
+}
+
+export const FacebookOGPreview = ({ image, title, description }: FacebookOGPreviewProps) => {
   return (
     <div
       style={{
@@ -12,7 +19,6 @@ export const FacebookOGPreview = ({ image, title, description }) => {
         marginBottom: '40px',
       }}
     >
-      {/* Image section */}
       <div
         style={{
           borderBottom: '1px solid #dadde1',
@@ -36,9 +42,7 @@ export const FacebookOGPreview = ({ image, title, description }) => {
         </div>
       </div>
 
-      {/* Text section */}
       <div style={{ backgroundColor: '#f2f3f5', padding: '12px 10px', lineHeight: '1.4' }}>
-        {/* Site name */}
         <div
           style={{
             fontSize: '12px',
@@ -53,7 +57,6 @@ export const FacebookOGPreview = ({ image, title, description }) => {
           your-site.io
         </div>
 
-        {/* Title */}
         <div
           style={{
             fontSize: '16px',
@@ -68,7 +71,6 @@ export const FacebookOGPreview = ({ image, title, description }) => {
           {title.substring(0, 65)}
         </div>
 
-        {/* Description */}
         <div
           style={{
             fontSize: '14px',

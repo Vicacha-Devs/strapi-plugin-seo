@@ -1,23 +1,18 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-
+import { Box, Button, Modal, TextButton, Typography } from '@strapi/design-system';
+import { ArrowRight, Eye } from '@strapi/icons';
 import {
   unstable_useContentManagerContext as useContentManagerContext,
   unstable_useDocument as useDocument,
 } from '@strapi/strapi/admin';
-import { Box, Button, Typography, TextButton, Modal } from '@strapi/design-system';
-import { Eye, ArrowRight } from '@strapi/icons';
-
-import { reducer } from './reducer';
-
-import { SeoChecks } from '../SeoChecks';
-import { PreviewChecks } from './PreviewChecks';
-import { BrowserPreview } from './BrowserPreview';
-import { OpenGraphPreview } from './OpenGraphPreview';
-
-import { getTrad } from '../../../../utils/getTrad';
+import {
+  DEFAULT_SEO_CHECKS,
+  type SeoCheckerAction,
+  type SeoChecksState,
+} from '../../../../../../shared';
 import { useSettingsApi } from '../../../../hooks/useSettingsApi';
-import { getRichTextData } from '../../utils/getRichTextData';
+import { getTrad } from '../../../../utils/getTrad';
 import {
   canonicalUrlPreview,
   getAlternativeTextPreview,
@@ -30,25 +25,31 @@ import {
   openGraphPreview,
   structuredDataPreview,
 } from '../../utils/checks';
+import { getRichTextData } from '../../utils/getRichTextData';
+import { SeoChecks } from '../SeoChecks';
+import { BrowserPreview } from './BrowserPreview';
+import { OpenGraphPreview } from './OpenGraphPreview';
+import { PreviewChecks } from './PreviewChecks';
+import { reducer } from './reducer';
 
-const initialState = {
+const initialState: SeoChecksState = {
   preview: true,
 };
 
-export const SeoCheckerContext = React.createContext(null);
+export const SeoCheckerContext = React.createContext<React.Dispatch<SeoCheckerAction> | null>(null);
 
 export const Summary = () => {
   const { formatMessage } = useIntl();
   const { getSettings } = useSettingsApi();
 
   const [isLoading, setIsLoading] = React.useState(true);
-  const [localChecks, setLocalChecks] = React.useState({});
+  const [localChecks, setLocalChecks] = React.useState<SeoChecksState>({});
   const [checks, dispatch] = React.useReducer(reducer, initialState);
 
   const { model, collectionType, id, form, contentType, components } = useContentManagerContext();
-  const { values: modifiedData } = form;
+  const { values: modifiedData } = form as { values: Record<string, any> };
 
-  const { metaTitle, metaDescription, openGraph } = modifiedData.seo;
+  const { metaTitle, metaDescription, openGraph } = modifiedData.seo ?? {};
 
   const { document } = useDocument({
     model,
@@ -56,44 +57,49 @@ export const Summary = () => {
     documentId: id,
   });
 
-  const getAllChecks = async (modifiedData, components, contentType) => {
+  const getAllChecks = async (
+    currentModifiedData: Record<string, any>,
+    currentComponents: Record<string, any>,
+    currentContentType: Record<string, any>
+  ): Promise<SeoChecksState> => {
     const { data: defaultSettings } = await getSettings();
+    const seoChecks = defaultSettings?.[currentContentType?.uid]?.seoChecks ?? DEFAULT_SEO_CHECKS;
 
     const { wordCount, keywordsDensity, emptyAltCount } = getRichTextData(
-      modifiedData,
-      components,
-      contentType
+      currentModifiedData,
+      currentComponents,
+      currentContentType
     );
 
-    let result = {
-      ...(defaultSettings[contentType?.uid]?.seoChecks?.metaTitle && {
-        metaTitle: getMetaTitleCheckPreview(modifiedData),
+    const result: SeoChecksState = {
+      ...(seoChecks?.metaTitle && {
+        metaTitle: getMetaTitleCheckPreview(currentModifiedData),
       }),
-      ...(defaultSettings[contentType?.uid]?.seoChecks?.wordCount && {
+      ...(seoChecks?.wordCount && {
         wordCount: getWordCountPreview(wordCount),
       }),
-      ...(defaultSettings[contentType?.uid]?.seoChecks?.metaRobots && {
-        metaRobots: metaRobotPreview(modifiedData),
+      ...(seoChecks?.metaRobots && {
+        metaRobots: metaRobotPreview(currentModifiedData),
       }),
-      ...(defaultSettings[contentType?.uid]?.seoChecks?.openGraph && {
-        openGraph: openGraphPreview(modifiedData),
+      ...(seoChecks?.openGraph && {
+        openGraph: openGraphPreview(currentModifiedData),
       }),
-      ...(defaultSettings[contentType?.uid]?.seoChecks?.canonicalUrl && {
-        canonicalUrl: canonicalUrlPreview(modifiedData),
+      ...(seoChecks?.canonicalUrl && {
+        canonicalUrl: canonicalUrlPreview(currentModifiedData),
       }),
-      ...(defaultSettings[contentType?.uid]?.seoChecks?.lastUpdatedAt && {
-        lastUpdatedAt: lastUpdatedAtPreview(modifiedData),
+      ...(seoChecks?.lastUpdatedAt && {
+        lastUpdatedAt: lastUpdatedAtPreview(currentModifiedData),
       }),
-      ...(defaultSettings[contentType?.uid]?.seoChecks?.structuredData && {
-        structuredData: structuredDataPreview(modifiedData),
+      ...(seoChecks?.structuredData && {
+        structuredData: structuredDataPreview(currentModifiedData),
       }),
-      ...(defaultSettings[contentType?.uid]?.seoChecks?.metaDescription && {
-        metaDescription: getMetaDescriptionPreview(modifiedData),
+      ...(seoChecks?.metaDescription && {
+        metaDescription: getMetaDescriptionPreview(currentModifiedData),
       }),
-      ...(defaultSettings[contentType?.uid]?.seoChecks?.alternativeText && {
+      ...(seoChecks?.alternativeText && {
         alternativeText: getAlternativeTextPreview(emptyAltCount),
       }),
-      ...(defaultSettings[contentType?.uid]?.seoChecks?.keywordDensity && {
+      ...(seoChecks?.keywordDensity && {
         keywordsDensity: getKeywordDensityPreview(keywordsDensity),
       }),
     };
@@ -105,22 +111,23 @@ export const Summary = () => {
     const fetchChecks = async () => {
       if (!(JSON.stringify(localChecks) === JSON.stringify(checks))) {
         if (checks?.preview) {
-          const status = await getAllChecks(modifiedData, components, contentType);
+          const status = await getAllChecks(modifiedData, components, contentType as Record<string, any>);
 
           dispatch({
             type: 'UPDATE_FOR_PREVIEW',
             value: status,
           });
-        } else
+        } else {
           dispatch({
             type: 'UPDATE_FOR_PREVIEW',
             value: checks,
           });
+        }
         setLocalChecks(checks);
       }
     };
 
-    fetchChecks().then(() => {
+    void fetchChecks().then(() => {
       setIsLoading(false);
     });
   }, [checks]);
@@ -184,7 +191,7 @@ export const Summary = () => {
             updatedAt={document?.updatedAt ?? null}
             modifiedData={modifiedData}
             components={components}
-            contentType={contentType}
+            contentType={contentType as Record<string, any>}
             checks={checks}
           />
         </Modal.Root>

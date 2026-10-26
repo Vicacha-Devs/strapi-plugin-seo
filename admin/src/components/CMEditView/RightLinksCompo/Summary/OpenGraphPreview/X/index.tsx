@@ -1,6 +1,13 @@
 import * as React from 'react';
+import type { OpenGraphImage } from '../../../../../../../../shared';
 
-export const TwitterOGPreview = ({ image, title, description }) => {
+interface TwitterOGPreviewProps {
+  image: OpenGraphImage;
+  title: string;
+  description: string;
+}
+
+export const TwitterOGPreview = ({ image, title, description }: TwitterOGPreviewProps) => {
   return (
     <div
       style={{
@@ -15,7 +22,6 @@ export const TwitterOGPreview = ({ image, title, description }) => {
         marginBottom: '40px',
       }}
     >
-      {/* Image section */}
       <div
         style={{
           backgroundSize: 'cover',
@@ -39,7 +45,6 @@ export const TwitterOGPreview = ({ image, title, description }) => {
         </div>
       </div>
 
-      {/* Content section */}
       <div
         style={{
           backgroundColor: '#ffffff',
@@ -48,7 +53,6 @@ export const TwitterOGPreview = ({ image, title, description }) => {
           borderTop: '1px solid #e1e8ed',
         }}
       >
-        {/* Site name */}
         <div
           style={{
             fontSize: '12px',
@@ -62,7 +66,6 @@ export const TwitterOGPreview = ({ image, title, description }) => {
           your-site.io
         </div>
 
-        {/* Title */}
         <div
           style={{
             fontSize: '16px',
@@ -77,7 +80,6 @@ export const TwitterOGPreview = ({ image, title, description }) => {
           {title.substring(0, 70)}
         </div>
 
-        {/* Description */}
         <div
           style={{
             fontSize: '14px',

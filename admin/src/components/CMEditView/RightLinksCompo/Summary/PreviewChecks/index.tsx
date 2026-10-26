@@ -1,29 +1,31 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-
 import { Box, Flex, Typography } from '@strapi/design-system';
 import { CheckCircle, CrossCircle, WarningCircle } from '@strapi/icons';
-
+import type { SeoChecksState, SeoCheckStatus } from '../../../../../../../shared';
 import { getTrad } from '../../../../../utils/getTrad';
 import { qualityVerdict } from '../../../utils/checks';
 
-export const PreviewChecks = ({ checks }) => {
-  const { formatMessage } = useIntl();
+interface PreviewChecksProps {
+  checks: SeoChecksState;
+}
 
-  const good = Object.values(checks).filter(
-    (check) => check.qualityVerdict === qualityVerdict.good
-  ).length;
-  const improvements = Object.values(checks).filter(
+export const PreviewChecks = ({ checks }: PreviewChecksProps) => {
+  const { formatMessage } = useIntl();
+  const values = Object.values(checks || {}).filter(
+    (c): c is SeoCheckStatus => Boolean(c && typeof c === 'object' && 'qualityVerdict' in c)
+  );
+
+  const good = values.filter((check) => check.qualityVerdict === qualityVerdict.good).length;
+  const improvements = values.filter(
     (check) => check.qualityVerdict === qualityVerdict.improvements
   ).length;
-  const bad = Object.values(checks).filter(
-    (check) => check.qualityVerdict === qualityVerdict.bad
-  ).length;
+  const bad = values.filter((check) => check.qualityVerdict === qualityVerdict.bad).length;
 
   return (
     <Box paddingTop={2}>
       <Flex gap={2} key={qualityVerdict.good}>
-        <CheckCircle aria-hidden={true} fill={`success600`} />
+        <CheckCircle aria-hidden={true} fill="success600" />
         <Typography>
           {formatMessage({
             id: getTrad('Good'),
@@ -33,7 +35,7 @@ export const PreviewChecks = ({ checks }) => {
         </Typography>
       </Flex>
       <Flex gap={2} key={qualityVerdict.improvements}>
-        <WarningCircle aria-hidden={true} fill={`warning600`} />
+        <WarningCircle aria-hidden={true} fill="warning600" />
         <Typography>
           {formatMessage({
             id: getTrad('Improvements'),
@@ -43,7 +45,7 @@ export const PreviewChecks = ({ checks }) => {
         </Typography>
       </Flex>
       <Flex gap={2} key={qualityVerdict.bad}>
-        <CrossCircle aria-hidden={true} fill={`danger600`} />
+        <CrossCircle aria-hidden={true} fill="danger600" />
         <Typography>
           {formatMessage({
             id: getTrad('Bad'),

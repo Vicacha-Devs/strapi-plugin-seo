@@ -1,30 +1,29 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-
-import get from 'lodash/get';
-
-import { Box, Flex, Divider, Typography, EmptyStateLayout, Modal } from '@strapi/design-system';
-
-import { Serp } from './Serp';
-import { MetaChecks } from './MetaChecks';
-import { KeywordCheck } from './KeywordCheck';
-
-import { Illo } from '../../../../HomePage/Main/EmptyComponentLayout/illo';
-
+import { Box, Divider, EmptyStateLayout, Flex, Modal, Typography } from '@strapi/design-system';
+import { get } from '../../../../../utils/get';
 import { getTrad } from '../../../../../utils/getTrad';
+import { Illo } from '../../../../HomePage/Main/EmptyComponentLayout/illo';
+import { KeywordCheck } from './KeywordCheck';
+import { MetaChecks } from './MetaChecks';
+import { Serp } from './Serp';
 
-export const BrowserPreview = ({ modifiedData }) => {
+interface BrowserPreviewProps {
+  modifiedData: Record<string, any>;
+}
+
+export const BrowserPreview = ({ modifiedData }: BrowserPreviewProps) => {
   const { formatMessage } = useIntl();
 
-  const seo = get(modifiedData, 'seo', null);
-  const metaTitle = get(seo, 'metaTitle', null);
-  const metaDescription = get(seo, 'metaDescription', null);
-  const keywords = get(seo, 'keywords', null);
+  const seo = get<Record<string, any> | null>(modifiedData, 'seo', null);
+  const metaTitle = get<string | null>(seo, 'metaTitle', null);
+  const metaDescription = get<string | null>(seo, 'metaDescription', null);
+  const keywords = get<string | null>(seo, 'keywords', null);
 
   return (
-    <Modal.Content labelledBy="title">
+    <Modal.Content>
       <Modal.Header>
-        <Typography fontWeight="bold" textColor="neutral800" as="h2" id="title">
+        <Typography fontWeight="bold" textColor="neutral800" tag="h2">
           {formatMessage({
             id: getTrad('Button.browser-preview'),
             defaultMessage: 'Browser Preview',
@@ -49,7 +48,6 @@ export const BrowserPreview = ({ modifiedData }) => {
             {keywords && (
               <React.Fragment>
                 {metaTitle && <KeywordCheck item={metaTitle} keywords={keywords} label="title" />}
-
                 {metaDescription && (
                   <KeywordCheck item={metaDescription} keywords={keywords} label="description" />
                 )}
