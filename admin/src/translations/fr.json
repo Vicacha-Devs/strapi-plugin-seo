@@ -106,5 +106,10 @@
     "Improvements": "Améliorations",
     "Bad": "Problèmes",
     "Social-preview.alert": "Complétez votre composant afin d'obtenir un aperçu",
-    "Information": "Information"
+    "Information": "Information",
+    "SEOPage.info.no-plugin-content-type": "Vous n'avez encore aucun type de contenu de plugin...",
+    "SEOPage.tab.plugin-title": "Plugins",
+    "SEOChecks.metaRobotsCheck.not-found": "Aucune balise meta Robots n'a été trouvée.",
+    "notification.success.settings": "Paramètres enregistrés pour le type de contenu {collectionName}.",
+    "Modal.seo-component-empty-open-graph": "Les métadonnées Open Graph sont vides..."
 }
