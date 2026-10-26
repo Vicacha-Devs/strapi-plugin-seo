@@ -106,5 +106,9 @@
     "Improvements": "Improvements",
     "Bad": "Bad",
     "Social-preview.alert": "Complete your social component to see the preview",
-    "Information": "Information"
+    "Information": "Information",
+    "SEOPage.info.no-plugin-content-type": "You don't have any plugin content-type yet...",
+    "SEOPage.tab.plugin-title": "Plugins",
+    "SEOChecks.metaRobotsCheck.not-found": "No Robot meta tags have been found.",
+    "notification.success.settings": "Settings saved for {collectionName} content-type."
 }
