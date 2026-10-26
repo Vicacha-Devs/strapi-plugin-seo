@@ -1,14 +1,10 @@
 import * as React from 'react';
-
-// TODO update this in helper plugin docs
 import { unstable_useContentManagerContext as useContentManagerContext } from '@strapi/strapi/admin';
-
 import { Summary } from './Summary';
 
 export const SeoChecker = () => {
-  const {
-    form: { values },
-  } = useContentManagerContext();
+  const { form } = useContentManagerContext();
+  const values = (form as { values?: Record<string, any> }).values;
 
   if (values?.seo) {
     return <Summary />;
