@@ -15,10 +15,13 @@ To install this plugin, you need to add an NPM dependency to your Strapi applica
 
 ```sh
 # Using Yarn
-yarn add @strapi/plugin-seo
+yarn add @notum-cz/strapi-plugin-seo
+
+# Or using PNPM
+pnpm add @notum-cz/strapi-plugin-seo
 
 # Or using NPM
-npm install @strapi/plugin-seo
+npm install @notum-cz/strapi-plugin-seo
 ```
 
 ## How it works
@@ -39,13 +42,12 @@ From any content manager view for a content-type that contains the SEO component
 
 **Note**: You'll need to fill your SEO component with data to be able to see the SERP preview, Social post preview and complete analysis.
 
-
 ## Configuration
 
-`./config/plugins.js`
+`./config/plugins.ts`
 
-```js
-module.exports = ({ env }) => ({
+```ts
+export default () => ({
   // ...
   seo: {
     enabled: true,
@@ -59,6 +61,9 @@ Then, you'll need to build your admin panel:
 ```sh
 # Using Yarn
 yarn build
+
+# Or using PNPM
+pnpm build
 
 # Or using NPM
 npm run build
