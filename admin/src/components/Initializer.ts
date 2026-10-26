@@ -1,13 +1,12 @@
-/**
- *
- * Initializer
- *
- */
 import * as React from 'react';
 import { pluginId } from '../pluginId';
 
-export const Initializer = ({ setPlugin }) => {
-  const ref = React.useRef(undefined);
+interface InitializerProps {
+  setPlugin: (id: string) => void;
+}
+
+export const Initializer = ({ setPlugin }: InitializerProps) => {
+  const ref = React.useRef<((id: string) => void) | undefined>(undefined);
   ref.current = setPlugin;
 
   React.useEffect(() => {

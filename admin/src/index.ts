@@ -1,3 +1,4 @@
+import type { StrapiApp } from '@strapi/strapi/admin';
 import { Search } from '@strapi/icons';
 
 import pluginPkg from '../../package.json';
@@ -11,7 +12,7 @@ import { prefixPluginTranslations } from './utils/prefixPluginTranslations';
 const name = pluginPkg.strapi.name;
 
 export default {
-  register(app) {
+  register(app: StrapiApp) {
     app.addMenuLink({
       to: `${pluginId}`,
       icon: Search,
@@ -29,17 +30,17 @@ export default {
       name,
     });
   },
-  bootstrap(app) {
+  bootstrap(app: StrapiApp) {
     app.getPlugin('content-manager').injectComponent('editView', 'right-links', {
       name: 'SeoChecker',
       Component: SeoChecker,
     });
   },
-  async registerTrads(app) {
+  async registerTrads(app: { locales: string[] }) {
     const { locales } = app;
 
     const importedTrads = await Promise.all(
-      locales.map((locale) => {
+      locales.map((locale: string) => {
         return import(`./translations/${locale}.json`)
           .then(({ default: data }) => {
             return {
