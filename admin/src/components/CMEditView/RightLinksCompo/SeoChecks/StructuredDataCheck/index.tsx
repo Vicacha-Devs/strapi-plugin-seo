@@ -1,22 +1,23 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-
-import isEqual from 'lodash/isEqual';
 import isEmpty from 'lodash/isEmpty';
-
-import { Box } from '@strapi/design-system';
-
-import { SEOAccordion } from '../SEOAccordion';
-import { SeoCheckerContext } from '../../Summary';
-
+import isEqual from 'lodash/isEqual';
+import type { SeoChecksState, SeoCheckStatus } from '../../../../../../../shared';
 import { getTrad } from '../../../../../utils/getTrad';
 import { qualityVerdict } from '../../../utils/checks';
+import { SeoCheckerContext } from '../../Summary';
+import { SEOAccordion } from '../SEOAccordion';
 
-export const StructuredDataCheck = ({ structuredData, checks }) => {
+interface StructuredDataCheckProps {
+  structuredData: unknown;
+  checks: SeoChecksState;
+}
+
+export const StructuredDataCheck = ({ structuredData, checks }: StructuredDataCheckProps) => {
   const { formatMessage } = useIntl();
   const dispatch = React.useContext(SeoCheckerContext);
 
-  let status = {
+  let status: SeoCheckStatus = {
     message: formatMessage({
       id: getTrad('SEOChecks.structuredDataCheck.default'),
       defaultMessage:
@@ -35,11 +36,12 @@ export const StructuredDataCheck = ({ structuredData, checks }) => {
         qualityVerdict: qualityVerdict.bad,
       };
     }
-    if (!isEqual(status, checks.structuredData))
+    if (!isEqual(status, checks.structuredData) && dispatch) {
       dispatch({
         type: 'UPDATE_PONCTUAL',
         value: { ...status, entity: 'structuredData' },
       });
+    }
   }, []);
 
   return (

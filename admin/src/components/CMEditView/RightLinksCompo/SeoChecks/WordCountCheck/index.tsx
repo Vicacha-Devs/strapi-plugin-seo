@@ -1,23 +1,25 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-
+import { Box, Typography } from '@strapi/design-system';
 import isEqual from 'lodash/isEqual';
 import isNull from 'lodash/isNull';
 import isNumber from 'lodash/isNumber';
-
-import { Box, Typography } from '@strapi/design-system';
-
-import { SEOAccordion } from '../SEOAccordion';
-import { SeoCheckerContext } from '../../Summary';
-
+import type { SeoChecksState, SeoCheckStatus } from '../../../../../../../shared';
 import { getTrad } from '../../../../../utils/getTrad';
 import { qualityVerdict } from '../../../utils/checks';
+import { SeoCheckerContext } from '../../Summary';
+import { SEOAccordion } from '../SEOAccordion';
 
-export const WordCountCheck = ({ wordCount, checks }) => {
+interface WordCountCheckProps {
+  wordCount: number | null;
+  checks: SeoChecksState;
+}
+
+export const WordCountCheck = ({ wordCount, checks }: WordCountCheckProps) => {
   const { formatMessage } = useIntl();
   const dispatch = React.useContext(SeoCheckerContext);
 
-  let status = {
+  let status: SeoCheckStatus = {
     message: formatMessage({
       id: getTrad('SEOChecks.wordCountCheck.default'),
       defaultMessage:
@@ -45,11 +47,12 @@ export const WordCountCheck = ({ wordCount, checks }) => {
         qualityVerdict: qualityVerdict.improvements,
       };
     }
-    if (!isEqual(status, checks.wordCount))
+    if (!isEqual(status, checks.wordCount) && dispatch) {
       dispatch({
         type: 'UPDATE_PONCTUAL',
         value: { ...status, entity: 'wordCount' },
       });
+    }
   }, []);
 
   return (

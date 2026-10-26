@@ -1,25 +1,28 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
+import { Box, Flex, ProgressBar, Typography } from '@strapi/design-system';
+import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 import isNull from 'lodash/isNull';
-import isEmpty from 'lodash/isEmpty';
-
-import { Box, Flex, ProgressBar, Typography } from '@strapi/design-system';
-
-import { SEOAccordion } from '../SEOAccordion';
-import { SeoCheckerContext } from '../../Summary';
-
+import type { SeoChecksState, SeoCheckStatus } from '../../../../../../../shared';
 import { getTrad } from '../../../../../utils/getTrad';
 import { qualityVerdict } from '../../../utils/checks';
+import { SeoCheckerContext } from '../../Summary';
+import { SEOAccordion } from '../SEOAccordion';
 
-export const MetaDescriptionCheck = ({ metaDescription, checks }) => {
+interface MetaDescriptionCheckProps {
+  metaDescription: string | null;
+  checks: SeoChecksState;
+}
+
+export const MetaDescriptionCheck = ({ metaDescription, checks }: MetaDescriptionCheckProps) => {
   const { formatMessage } = useIntl();
   const dispatch = React.useContext(SeoCheckerContext);
 
   const maxLength = 160;
   const minimumLength = 50;
 
-  let status = {
+  let status: SeoCheckStatus = {
     message: formatMessage({
       id: getTrad('SEOChecks.metaDescriptionCheck.default'),
       defaultMessage: 'A Meta Description has been found!',
@@ -53,11 +56,12 @@ export const MetaDescriptionCheck = ({ metaDescription, checks }) => {
         qualityVerdict: qualityVerdict.bad,
       };
     }
-    if (!isEqual(status, checks.metaDescription))
+    if (!isEqual(status, checks.metaDescription) && dispatch) {
       dispatch({
         type: 'UPDATE_PONCTUAL',
         value: { ...status, entity: 'metaDescription' },
       });
+    }
   }, []);
 
   return (
@@ -78,14 +82,14 @@ export const MetaDescriptionCheck = ({ metaDescription, checks }) => {
               {metaDescription}
             </Typography>
             <Box paddingTop={2}>
-              <Flex horizontal spacing={2}>
+              <Flex>
                 <ProgressBar
                   value={
                     (metaDescription.length * 100) / maxLength > 100
                       ? 100
                       : (metaDescription.length * 100) / maxLength
                   }
-                ></ProgressBar>
+                />
                 <Typography variant="pi" padding={2}>
                   ({metaDescription.length}/{maxLength})
                 </Typography>

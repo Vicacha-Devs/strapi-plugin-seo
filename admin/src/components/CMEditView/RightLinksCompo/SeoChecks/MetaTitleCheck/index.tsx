@@ -1,25 +1,27 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-
+import { Box, Flex, ProgressBar, Typography } from '@strapi/design-system';
+import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 import isNull from 'lodash/isNull';
-import isEmpty from 'lodash/isEmpty';
-
-import { Box, Flex, ProgressBar, Typography } from '@strapi/design-system';
-
-import { SEOAccordion } from '../SEOAccordion';
-import { SeoCheckerContext } from '../../Summary';
-
+import type { SeoChecksState, SeoCheckStatus } from '../../../../../../../shared';
 import { getTrad } from '../../../../../utils/getTrad';
 import { qualityVerdict } from '../../../utils/checks';
+import { SeoCheckerContext } from '../../Summary';
+import { SEOAccordion } from '../SEOAccordion';
 
-export const MetaTitleCheck = ({ metaTitle, checks }) => {
+interface MetaTitleCheckProps {
+  metaTitle: string | null;
+  checks: SeoChecksState;
+}
+
+export const MetaTitleCheck = ({ metaTitle, checks }: MetaTitleCheckProps) => {
   const { formatMessage } = useIntl();
   const dispatch = React.useContext(SeoCheckerContext);
 
   const maxLength = 60;
 
-  let status = {
+  let status: SeoCheckStatus = {
     message: formatMessage({
       id: getTrad('SEOChecks.metaTitleCheck.default'),
       defaultMessage: 'A Meta Title has been found!',
@@ -45,11 +47,12 @@ export const MetaTitleCheck = ({ metaTitle, checks }) => {
         qualityVerdict: qualityVerdict.bad,
       };
     }
-    if (!isEqual(status, checks.metaTitle))
+    if (!isEqual(status, checks.metaTitle) && dispatch) {
       dispatch({
         type: 'UPDATE_PONCTUAL',
         value: { ...status, entity: 'metaTitle' },
       });
+    }
   }, []);
 
   return (
@@ -72,7 +75,7 @@ export const MetaTitleCheck = ({ metaTitle, checks }) => {
             </Typography>
 
             <Box paddingTop={2}>
-              <Flex horizontal spacing={2}>
+              <Flex>
                 <ProgressBar
                   size="M"
                   value={
@@ -80,7 +83,7 @@ export const MetaTitleCheck = ({ metaTitle, checks }) => {
                       ? 100
                       : (metaTitle.length * 100) / maxLength
                   }
-                ></ProgressBar>
+                />
                 <Typography variant="pi" padding={2}>
                   ({metaTitle.length}/{maxLength})
                 </Typography>

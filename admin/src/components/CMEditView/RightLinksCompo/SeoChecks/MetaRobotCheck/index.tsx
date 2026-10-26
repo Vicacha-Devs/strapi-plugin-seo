@@ -1,19 +1,15 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-
+import { Box, Flex, Status, Typography } from '@strapi/design-system';
+import { CheckCircle, WarningCircle } from '@strapi/icons';
+import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 import isNull from 'lodash/isNull';
-import isEmpty from 'lodash/isEmpty';
-import get from 'lodash/get';
-
-import { Box, Status, Flex, Typography } from '@strapi/design-system';
-import { CheckCircle, WarningCircle } from '@strapi/icons';
-
-import { SEOAccordion } from '../SEOAccordion';
-import { SeoCheckerContext } from '../../Summary';
-
+import type { SeoChecksState, SeoCheckStatus } from '../../../../../../../shared';
 import { getTrad } from '../../../../../utils/getTrad';
 import { qualityVerdict } from '../../../utils/checks';
+import { SeoCheckerContext } from '../../Summary';
+import { SEOAccordion } from '../SEOAccordion';
 
 const robotTags = [
   { name: 'noindex', message: 'Search engines will index this page.' },
@@ -36,18 +32,23 @@ const robotTags = [
   },
 ];
 
-export const MetaRobotCheck = ({ metaRobots, checks }) => {
+interface MetaRobotCheckProps {
+  metaRobots: string | null;
+  checks: SeoChecksState;
+}
+
+export const MetaRobotCheck = ({ metaRobots, checks }: MetaRobotCheckProps) => {
   const { formatMessage } = useIntl();
   const dispatch = React.useContext(SeoCheckerContext);
 
-  let status = {
+  let status: SeoCheckStatus = {
     message: formatMessage({
       id: getTrad('SEOChecks.metaRobotsCheck.default'),
       defaultMessage: 'Robot meta tags have been found!',
     }),
     qualityVerdict: qualityVerdict.good,
   };
-  const [tags, setTags] = React.useState([]);
+  const [tags, setTags] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     if (isNull(metaRobots) || isEmpty(metaRobots)) {
@@ -61,11 +62,12 @@ export const MetaRobotCheck = ({ metaRobots, checks }) => {
     } else {
       setTags(metaRobots.split(','));
     }
-    if (!isEqual(status, checks.metaRobots))
+    if (!isEqual(status, checks.metaRobots) && dispatch) {
       dispatch({
         type: 'UPDATE_PONCTUAL',
         value: { ...status, entity: 'metaRobots' },
       });
+    }
   }, []);
 
   return (
@@ -83,30 +85,29 @@ export const MetaRobotCheck = ({ metaRobots, checks }) => {
       component={
         <Box padding={2} background="neutral100">
           {robotTags.map((tag, index) => (
-            <Flex spacing={2} key={index} horizontal padding={2}>
+            <Flex key={index} padding={2}>
               {tags.find((x) => x.trim() === tag.name) ? (
-                <CheckCircle aria-hidden={true} fill={`success600`} />
+                <CheckCircle aria-hidden={true} fill="success600" />
               ) : (
-                <WarningCircle aria-hidden={true} fill={`warning600`} />
+                <WarningCircle aria-hidden={true} fill="warning600" />
               )}
 
               <Typography paddingLeft={1}>
                 {tags.find((x) => x.trim() === tag.name)
-                  ? `${tag.name} is activated:
-          ${tag.message.replace('will', 'will not')}`
+                  ? `${tag.name} is activated: ${tag.message.replace('will', 'will not')}`
                   : `${tag.name} is disabled: ${tag.message}`}
               </Typography>
             </Flex>
           ))}
-          <Flex spacing={2} paddingTop={4} paddingLeft={2} paddingRight={2} paddingBottom={4}>
-            <Status variant="secondary" showBullet={false}>
+          <Flex paddingTop={4} paddingLeft={2} paddingRight={2} paddingBottom={4}>
+            <Status variant="secondary">
               <Typography>
                 <Typography fontWeight="bold">Notice: </Typography>
                 In order to not index your entry and no follow, your MetaRobots field should contain
                 the following:
                 <Typography fontWeight="bold"> noindex, nofollow </Typography>. The rest should be
-                handled by your front-end code logic. "If the field contains noindex, then you need
-                to create the corresponding meta tag etc..."
+                handled by your front-end code logic. &quot;If the field contains noindex, then you
+                need to create the corresponding meta tag etc...&quot;
               </Typography>
             </Status>
           </Flex>

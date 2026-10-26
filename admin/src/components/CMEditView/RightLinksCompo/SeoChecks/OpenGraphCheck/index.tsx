@@ -1,20 +1,27 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-
 import isEqual from 'lodash/isEqual';
 import isNull from 'lodash/isNull';
-
-import { SEOAccordion } from '../SEOAccordion';
-import { SeoCheckerContext } from '../../Summary';
-
+import type {
+  OpenGraphData,
+  SeoChecksState,
+  SeoCheckStatus,
+} from '../../../../../../../shared';
 import { getTrad } from '../../../../../utils/getTrad';
 import { qualityVerdict } from '../../../utils/checks';
+import { SeoCheckerContext } from '../../Summary';
+import { SEOAccordion } from '../SEOAccordion';
 
-export const OpenGraphCheck = ({ openGraph, checks }) => {
+interface OpenGraphCheckProps {
+  openGraph: OpenGraphData | null;
+  checks: SeoChecksState;
+}
+
+export const OpenGraphCheck = ({ openGraph, checks }: OpenGraphCheckProps) => {
   const { formatMessage } = useIntl();
   const dispatch = React.useContext(SeoCheckerContext);
 
-  let status = {
+  let status: SeoCheckStatus = {
     message: '',
     qualityVerdict: qualityVerdict.good,
   };
@@ -28,7 +35,7 @@ export const OpenGraphCheck = ({ openGraph, checks }) => {
         }),
         qualityVerdict: qualityVerdict.bad,
       };
-    } else if (!openGraph['ogTitle'] || !openGraph['ogDescription'] || !openGraph['ogImage']) {
+    } else if (!openGraph.ogTitle || !openGraph.ogDescription || !openGraph.ogImage) {
       status = {
         message: formatMessage({
           id: getTrad('SEOChecks.openGraphCheck.not-configured'),
@@ -38,25 +45,26 @@ export const OpenGraphCheck = ({ openGraph, checks }) => {
       };
     } else {
       status = {
-        message: `${formatMessage({
+        message: formatMessage({
           id: getTrad('SEOChecks.openGraphCheck.configured'),
           defaultMessage: 'OpenGraph tags are configured',
-        })}`,
+        }),
         qualityVerdict: qualityVerdict.good,
       };
     }
 
-    if (!isEqual(status, checks.openGraph))
+    if (!isEqual(status, checks.openGraph) && dispatch) {
       dispatch({
         type: 'UPDATE_PONCTUAL',
         value: { ...status, entity: 'openGraph' },
       });
+    }
   }, []);
 
   return (
     <SEOAccordion
       title={formatMessage({
-        id: getTrad('SEOModal.summary-title.meta-social'),
+        id: getTrad('SEOModal.summary-title.open-graph'),
         defaultMessage: 'OpenGraph Tags',
       })}
       status={checks.openGraph}

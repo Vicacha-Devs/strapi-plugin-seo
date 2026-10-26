@@ -1,26 +1,27 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
+import { Box, Typography } from '@strapi/design-system';
+import { formatDistance } from 'date-fns';
 import isEqual from 'lodash/isEqual';
 import isNull from 'lodash/isNull';
-
-import { formatDistance } from 'date-fns';
-
-import { Box, Typography } from '@strapi/design-system';
-
+import type { SeoChecksState, SeoCheckStatus } from '../../../../../../../shared';
 import { getTrad } from '../../../../../utils/getTrad';
-
+import { qualityVerdict } from '../../../utils/checks';
+import { SeoCheckerContext } from '../../Summary';
 import { SEOAccordion } from '../SEOAccordion';
 
-import { SeoCheckerContext } from '../../Summary';
-import { qualityVerdict } from '../../../utils/checks';
+interface LastUpdatedAtCheckProps {
+  updatedAt: string | null;
+  checks: SeoChecksState;
+}
 
-export const LastUpdatedAtCheck = ({ updatedAt, checks }) => {
+export const LastUpdatedAtCheck = ({ updatedAt, checks }: LastUpdatedAtCheckProps) => {
   const { formatMessage } = useIntl();
   const dispatch = React.useContext(SeoCheckerContext);
 
-  let status = {
+  let status: SeoCheckStatus = {
     message: formatMessage({
-      id: getTrad('SSEOChecks.lastUpdatedAtCheck.default'),
+      id: getTrad('SEOChecks.lastUpdatedAtCheck.default'),
       defaultMessage:
         'This content was modified over a year ago! Search engines love fresh content.',
     }),
@@ -37,7 +38,9 @@ export const LastUpdatedAtCheck = ({ updatedAt, checks }) => {
         qualityVerdict: qualityVerdict.bad,
       };
     } else {
-      const oneYearAgo = Date.parse(new Date(new Date().setFullYear(new Date().getFullYear() - 1)));
+      const oneYearAgo = Date.parse(
+        new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString()
+      );
       if (Date.parse(updatedAt) >= oneYearAgo) {
         status = {
           message: formatMessage({
@@ -48,11 +51,12 @@ export const LastUpdatedAtCheck = ({ updatedAt, checks }) => {
         };
       }
     }
-    if (!isEqual(status, checks.lastUpdatedAt))
+    if (!isEqual(status, checks.lastUpdatedAt) && dispatch) {
       dispatch({
         type: 'UPDATE_PONCTUAL',
         value: { ...status, entity: 'lastUpdatedAt' },
       });
+    }
   }, []);
 
   return (
@@ -72,7 +76,7 @@ export const LastUpdatedAtCheck = ({ updatedAt, checks }) => {
           <Box padding={4} background="neutral100">
             <Typography variant="omega">
               {formatMessage({
-                id: getTrad('SEOChecks.lastUpdatedAtCheck.last"'),
+                id: getTrad('SEOChecks.lastUpdatedAtCheck.last'),
                 defaultMessage: 'Last updated at:',
               })}{' '}
               <Typography variant="omega" fontWeight="bold">

@@ -1,18 +1,23 @@
 import * as React from 'react';
-
-import { Box, Typography, Accordion, IconButton } from '@strapi/design-system';
-import { Information, CrossCircle, CheckCircle, WarningCircle } from '@strapi/icons';
+import { Accordion, Box, IconButton, Typography } from '@strapi/design-system';
+import { CheckCircle, CrossCircle, Information, WarningCircle } from '@strapi/icons';
+import type { SeoCheckStatus } from '../../../../../../../shared';
 import { qualityVerdict } from '../../../utils/checks';
 
-export const SEOAccordion = ({ title, status, component, label }) => {
+interface SEOAccordionProps {
+  title: string;
+  status?: SeoCheckStatus;
+  component?: React.ReactNode;
+  label: string;
+}
+
+export const SEOAccordion = ({ title, status, component, label }: SEOAccordionProps) => {
   const getIcon = () => {
     switch (status?.qualityVerdict) {
       case qualityVerdict.good:
         return CheckCircle;
       case qualityVerdict.improvements:
         return WarningCircle;
-      // TODO update the design system to support icons like this
-      // <WarningCircle fill="warning600" />
       case qualityVerdict.bad:
         return CrossCircle;
       default:

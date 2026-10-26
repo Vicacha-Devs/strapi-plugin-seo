@@ -1,23 +1,35 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-
-import isEqual from 'lodash/isEqual';
-
-import { Box, Flex, Typography, Status } from '@strapi/design-system';
+import { Box, Flex, Status, Typography } from '@strapi/design-system';
 import { WarningCircle } from '@strapi/icons';
-
+import isEqual from 'lodash/isEqual';
+import type {
+  EmptyAltOccurrence,
+  SeoChecksState,
+  SeoCheckStatus,
+} from '../../../../../../../shared';
 import { getTrad } from '../../../../../utils/getTrad';
-
+import { qualityVerdict } from '../../../utils/checks';
+import { SeoCheckerContext } from '../../Summary';
 import { SEOAccordion } from '../SEOAccordion';
 
-import { SeoCheckerContext } from '../../Summary';
-import { qualityVerdict } from '../../../utils/checks';
+interface AlternativeTextCheckProps {
+  intersections: number | null;
+  richTextAlts: EmptyAltOccurrence[];
+  altTexts: string[];
+  checks: SeoChecksState;
+}
 
-export const AlternativeTextCheck = ({ intersections, richTextAlts, altTexts, checks }) => {
+export const AlternativeTextCheck = ({
+  intersections,
+  richTextAlts,
+  altTexts,
+  checks,
+}: AlternativeTextCheckProps) => {
   const { formatMessage } = useIntl();
   const dispatch = React.useContext(SeoCheckerContext);
 
-  let status = {
+  let status: SeoCheckStatus = {
     message: formatMessage({
       id: getTrad('SEOChecks.alternativeTextCheck.default'),
       defaultMessage: 'All your images contain an alt attribute! Congrats!',
@@ -26,7 +38,7 @@ export const AlternativeTextCheck = ({ intersections, richTextAlts, altTexts, ch
   };
 
   React.useEffect(() => {
-    const missingRichTextAlt = richTextAlts.filter((x) => x.occurences != 0).length;
+    const missingRichTextAlt = richTextAlts.filter((x) => x.occurences !== 0).length;
 
     if (intersections === 0) {
       status = {
@@ -38,7 +50,7 @@ export const AlternativeTextCheck = ({ intersections, richTextAlts, altTexts, ch
         qualityVerdict: qualityVerdict.bad,
       };
     } else if (altTexts.includes('')) {
-      const count = Math.abs(intersections);
+      const count = Math.abs(intersections ?? 0);
       status = {
         message: `${count} ${formatMessage({
           id: getTrad('SEOChecks.alternativeTextCheck.intersection-negative'),
@@ -56,11 +68,12 @@ export const AlternativeTextCheck = ({ intersections, richTextAlts, altTexts, ch
         qualityVerdict: qualityVerdict.improvements,
       };
     }
-    if (!isEqual(status, checks.alternativeText))
+    if (!isEqual(status, checks.alternativeText) && dispatch) {
       dispatch({
         type: 'UPDATE_PONCTUAL',
         value: { ...status, entity: 'alternativeText' },
       });
+    }
   }, []);
 
   return (
@@ -77,8 +90,8 @@ export const AlternativeTextCheck = ({ intersections, richTextAlts, altTexts, ch
       })}
       component={
         <Box padding={2} background="neutral100">
-          <Flex spacing={2} horizontal padding={2}>
-            <WarningCircle aria-hidden={true} fill={`warning600`} />
+          <Flex padding={2}>
+            <WarningCircle aria-hidden={true} fill="warning600" />
             <Typography paddingLeft={1}>
               <Typography fontWeight="bold">
                 {altTexts.filter((item) => item === '').length}{' '}
@@ -91,10 +104,10 @@ export const AlternativeTextCheck = ({ intersections, richTextAlts, altTexts, ch
           </Flex>
 
           {richTextAlts.map((alt, index) => (
-            <Flex key={index} spacing={2} horizontal padding={2}>
+            <Flex key={index} padding={2}>
               {alt.occurences > 0 && (
                 <>
-                  <WarningCircle aria-hidden={true} fill={`warning600`} />
+                  <WarningCircle aria-hidden={true} fill="warning600" />
                   <Typography paddingLeft={1}>
                     <Typography fontWeight="bold">{alt.occurences} </Typography>
                     {formatMessage({
@@ -107,8 +120,8 @@ export const AlternativeTextCheck = ({ intersections, richTextAlts, altTexts, ch
               )}
             </Flex>
           ))}
-          <Flex spacing={2} paddingTop={4} paddingLeft={2} paddingRight={2} paddingBottom={4}>
-            <Status variant="secondary" showBullet={false}>
+          <Flex paddingTop={4} paddingLeft={2} paddingRight={2} paddingBottom={4}>
+            <Status variant="secondary">
               <Typography>
                 <Typography fontWeight="bold">Tip: </Typography>
                 Implement a rule in your front-end code that uses the name of your images if the

@@ -1,23 +1,29 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
+import { Badge, Box, Flex } from '@strapi/design-system';
+import { get } from '../../../../../utils/get';
 import isEmpty from 'lodash/isEmpty';
-import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
-
-import { Box, Flex, Badge } from '@strapi/design-system';
-
+import type {
+  KeywordDensityMap,
+  SeoChecksState,
+  SeoCheckStatus,
+} from '../../../../../../../shared';
 import { getTrad } from '../../../../../utils/getTrad';
-
+import { qualityVerdict } from '../../../utils/checks';
+import { SeoCheckerContext } from '../../Summary';
 import { SEOAccordion } from '../SEOAccordion';
 
-import { SeoCheckerContext } from '../../Summary';
-import { qualityVerdict } from '../../../utils/checks';
+interface KeywordDensityCheckProps {
+  keywordsDensity: KeywordDensityMap;
+  checks: SeoChecksState;
+}
 
-export const KeywordDensityCheck = ({ keywordsDensity, checks }) => {
+export const KeywordDensityCheck = ({ keywordsDensity, checks }: KeywordDensityCheckProps) => {
   const { formatMessage } = useIntl();
   const dispatch = React.useContext(SeoCheckerContext);
 
-  let status = {
+  let status: SeoCheckStatus = {
     message: formatMessage({
       id: getTrad('SEOChecks.keywordsDensityCheck.default'),
       defaultMessage: 'Every keywords are used more than 2 times.',
@@ -35,8 +41,9 @@ export const KeywordDensityCheck = ({ keywordsDensity, checks }) => {
         qualityVerdict: qualityVerdict.improvements,
       };
     } else {
-      Object.keys(keywordsDensity).map((keyword) => {
-        if (get(keywordsDensity[keyword], 'count', 0) === 0) {
+      Object.keys(keywordsDensity).forEach((keyword) => {
+        const count = get<number>(keywordsDensity[keyword], 'count', 0);
+        if (count === 0) {
           status = {
             message: formatMessage({
               id: getTrad('SEOChecks.keywordsDensityCheck.one-not-used'),
@@ -44,7 +51,7 @@ export const KeywordDensityCheck = ({ keywordsDensity, checks }) => {
             }),
             qualityVerdict: qualityVerdict.improvements,
           };
-        } else if (get(keywordsDensity[keyword], 'count', 0) <= 1) {
+        } else if (count <= 1) {
           status = {
             message: formatMessage({
               id: getTrad('SEOChecks.keywordsDensityCheck.one-used-once'),
@@ -56,11 +63,12 @@ export const KeywordDensityCheck = ({ keywordsDensity, checks }) => {
       });
     }
 
-    if (!isEqual(status, checks.keywordsDensity))
+    if (!isEqual(status, checks.keywordsDensity) && dispatch) {
       dispatch({
         type: 'UPDATE_PONCTUAL',
         value: { ...status, entity: 'keywordsDensity' },
       });
+    }
   }, []);
 
   return (
@@ -83,8 +91,7 @@ export const KeywordDensityCheck = ({ keywordsDensity, checks }) => {
               {Object.keys(keywordsDensity).map((keyword) => (
                 <Box padding={2} key={keyword}>
                   <Badge>
-                    {`${keyword}:
-                      ${get(keywordsDensity[keyword], 'count', 0).toString()}`}
+                    {`${keyword}: ${get<number>(keywordsDensity[keyword], 'count', 0).toString()}`}
                   </Badge>
                 </Box>
               ))}

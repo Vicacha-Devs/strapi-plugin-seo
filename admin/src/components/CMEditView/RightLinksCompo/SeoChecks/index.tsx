@@ -1,26 +1,36 @@
 import * as React from 'react';
-
-import { Box, Typography, EmptyStateLayout, Modal } from '@strapi/design-system';
-
+import { useIntl } from 'react-intl';
+import { Box, EmptyStateLayout, Modal, Typography } from '@strapi/design-system';
+import type { SeoChecksState } from '../../../../../../shared';
+import { getTrad } from '../../../../utils/getTrad';
 import { Illo } from '../../../HomePage/Main/EmptyComponentLayout/illo';
-
+import { getRichTextData } from '../../utils/getRichTextData';
+import { AlternativeTextCheck } from './AlternativeTextCheck';
+import { CanonicalUrlCheck } from './CanonicalUrlCheck';
+import { KeywordDensityCheck } from './KeywordDensityCheck';
+import { LastUpdatedAtCheck } from './LastUpdatedAtCheck';
+import { MetaDescriptionCheck } from './MetaDescriptionCheck';
 import { MetaRobotCheck } from './MetaRobotCheck';
-import { WordCountCheck } from './WordCountCheck';
 import { MetaTitleCheck } from './MetaTitleCheck';
 import { OpenGraphCheck } from './OpenGraphCheck';
-import { CanonicalUrlCheck } from './CanonicalUrlCheck';
-import { LastUpdatedAtCheck } from './LastUpdatedAtCheck';
-import { KeywordDensityCheck } from './KeywordDensityCheck';
 import { StructuredDataCheck } from './StructuredDataCheck';
-import { MetaDescriptionCheck } from './MetaDescriptionCheck';
-import { AlternativeTextCheck } from './AlternativeTextCheck';
+import { WordCountCheck } from './WordCountCheck';
 
-import { getRichTextData } from '../../utils/getRichTextData';
+interface SeoChecksProps {
+  updatedAt: string | null;
+  modifiedData: Record<string, any>;
+  components: Record<string, any>;
+  contentType: Record<string, any>;
+  checks: SeoChecksState;
+}
 
-import { useIntl } from 'react-intl';
-import { getTrad } from '../../../../utils/getTrad';
-
-export const SeoChecks = ({ updatedAt, modifiedData, components, contentType, checks }) => {
+export const SeoChecks = ({
+  updatedAt,
+  modifiedData,
+  components,
+  contentType,
+  checks,
+}: SeoChecksProps) => {
   const { formatMessage } = useIntl();
 
   const { wordCount, keywordsDensity, emptyAltCount } = getRichTextData(
@@ -30,12 +40,12 @@ export const SeoChecks = ({ updatedAt, modifiedData, components, contentType, ch
   );
 
   const seo = modifiedData?.seo ?? null;
-  const hasSeo = seo && Object.keys(seo).length > 0;
+  const hasSeo = Boolean(seo && Object.keys(seo).length > 0);
 
   return (
-    <Modal.Content labelledBy="title">
+    <Modal.Content>
       <Modal.Header>
-        <Typography fontWeight="bold" textColor="neutral800" as="h2" id="title">
+        <Typography fontWeight="bold" textColor="neutral800" tag="h2">
           {formatMessage({
             id: getTrad('Button.seo-analyze'),
             defaultMessage: 'SEO Analyze',
@@ -73,8 +83,8 @@ export const SeoChecks = ({ updatedAt, modifiedData, components, contentType, ch
             {checks?.alternativeText && (
               <AlternativeTextCheck
                 intersections={emptyAltCount?.intersections ?? null}
-                richTextAlts={emptyAltCount?.richTextAlts ?? null}
-                altTexts={emptyAltCount?.altTexts ?? null}
+                richTextAlts={emptyAltCount?.richTextAlts ?? []}
+                altTexts={emptyAltCount?.altTexts ?? []}
                 checks={checks}
               />
             )}
