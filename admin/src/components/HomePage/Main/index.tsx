@@ -1,29 +1,31 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
 import { NavLink } from 'react-router-dom';
-
 import {
   Box,
+  EmptyStateLayout,
   Flex,
   LinkButton,
-  Typography,
-  EmptyStateLayout,
   Table,
-  Thead,
-  Tbody,
-  Th,
-  Tr,
-  Td,
   Tabs,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+  Typography,
 } from '@strapi/design-system';
 import { Plus } from '@strapi/icons';
-
+import type { ContentTypesResponse } from '../../../../../shared';
+import { getTrad } from '../../../utils/getTrad';
 import { Illo } from './EmptyComponentLayout/illo';
 import { SettingsModal } from './SettingsModal';
 
-import { getTrad } from '../../../utils/getTrad';
+interface MainProps {
+  contentTypes?: ContentTypesResponse | null;
+}
 
-export const Main = ({ contentTypes }) => {
+export const Main = ({ contentTypes }: MainProps) => {
   const { formatMessage } = useIntl();
 
   const TabValues = {
@@ -62,8 +64,7 @@ export const Main = ({ contentTypes }) => {
           </Tabs.Trigger>
         </Tabs.List>
         <Tabs.Content value={TabValues.collectionTypes}>
-          {/* TABLE */}
-          <Table colCount={2} rowCount={contentTypes.collectionTypes.length}>
+          <Table colCount={2} rowCount={contentTypes?.collectionTypes?.length ?? 0}>
             <Thead>
               <Tr>
                 <Th>
@@ -132,12 +133,9 @@ export const Main = ({ contentTypes }) => {
               )}
             </Tbody>
           </Table>
-
-          {/* END TABLE */}
         </Tabs.Content>
         <Tabs.Content value={TabValues.singleTypes}>
-          {/* TABLE */}
-          <Table colCount={2} rowCount={contentTypes.singleTypes.length}>
+          <Table colCount={2} rowCount={contentTypes?.singleTypes?.length ?? 0}>
             <Thead>
               <Tr>
                 <Th>
@@ -206,12 +204,9 @@ export const Main = ({ contentTypes }) => {
               )}
             </Tbody>
           </Table>
-
-          {/* END TABLE */}
         </Tabs.Content>
         <Tabs.Content value={TabValues.plugins}>
-          {/* TABLE */}
-          <Table colCount={2} rowCount={contentTypes.plugins.length}>
+          <Table colCount={2} rowCount={contentTypes?.plugins?.length ?? 0}>
             <Thead>
               <Tr>
                 <Th>
@@ -256,7 +251,6 @@ export const Main = ({ contentTypes }) => {
                 ))
               ) : (
                 <Box padding={8} background="neutral0">
-                  {/* NEED LOCALE */}
                   <EmptyStateLayout
                     icon={<Illo />}
                     content={formatMessage({
@@ -268,8 +262,6 @@ export const Main = ({ contentTypes }) => {
               )}
             </Tbody>
           </Table>
-
-          {/* END TABLE */}
         </Tabs.Content>
       </Tabs.Root>
     </Box>

@@ -1,14 +1,17 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-
+import { Box, Button, Grid, Modal, Switch, Typography } from '@strapi/design-system';
 import { Cog, Information } from '@strapi/icons';
-import { Box, Switch, Button, Typography, Grid, Modal } from '@strapi/design-system';
 import { ContentBox, useNotification } from '@strapi/strapi/admin';
-
-import { getTrad } from '../../../../utils/getTrad';
+import type { ContentTypeSeoItem, SeoSettingsMap } from '../../../../../../shared';
 import { useSettingsApi } from '../../../../hooks/useSettingsApi';
+import { getTrad } from '../../../../utils/getTrad';
 
-export const SettingsModal = ({ item }) => {
+interface SettingsModalProps {
+  item: ContentTypeSeoItem;
+}
+
+export const SettingsModal = ({ item }: SettingsModalProps) => {
   const { toggleNotification } = useNotification();
   const { formatMessage } = useIntl();
   const { getSettings, setSettings } = useSettingsApi();
@@ -26,16 +29,15 @@ export const SettingsModal = ({ item }) => {
   const [alternativeText, setAlternativeText] = React.useState(true);
   const [lastUpdatedAt, setLastUpdatedAt] = React.useState(true);
 
-  const [defaultSettings, setDefaultSettings] = React.useState(null);
+  const [defaultSettings, setDefaultSettings] = React.useState<SeoSettingsMap | null>(null);
 
   React.useEffect(() => {
     const fetchDefaultSettings = async () => {
       const { data: defaultSettingsResult } = await getSettings();
-
       setDefaultSettings(defaultSettingsResult);
     };
 
-    fetchDefaultSettings();
+    void fetchDefaultSettings();
   }, []);
 
   const setupModalSettings = () => {
@@ -45,16 +47,16 @@ export const SettingsModal = ({ item }) => {
       return;
     }
 
-    setMetaTitle(seoChecks?.metaTitle);
-    setMetaDescription(seoChecks?.metaDescription);
-    setMetaRobots(seoChecks?.metaRobots);
-    setOpenGraph(seoChecks?.openGraph);
-    setWordCount(seoChecks?.wordCount);
-    setCanonicalUrl(seoChecks?.canonicalUrl);
-    setKeywordDensity(seoChecks?.keywordDensity);
-    setStructuredData(seoChecks?.structuredData);
-    setAlternativeText(seoChecks?.alternativeText);
-    setLastUpdatedAt(seoChecks?.lastUpdatedAt);
+    setMetaTitle(seoChecks.metaTitle);
+    setMetaDescription(seoChecks.metaDescription);
+    setMetaRobots(seoChecks.metaRobots);
+    setOpenGraph(seoChecks.openGraph);
+    setWordCount(seoChecks.wordCount);
+    setCanonicalUrl(seoChecks.canonicalUrl);
+    setKeywordDensity(seoChecks.keywordDensity);
+    setStructuredData(seoChecks.structuredData);
+    setAlternativeText(seoChecks.alternativeText);
+    setLastUpdatedAt(seoChecks.lastUpdatedAt);
   };
 
   const handleSavingSettingsModal = () => {
@@ -62,10 +64,13 @@ export const SettingsModal = ({ item }) => {
       return;
     }
 
-    const newSettings = {
+    const collectionName =
+      defaultSettings?.[item?.uid]?.collectionName ?? item?.globalId ?? item?.uid;
+
+    const newSettings: SeoSettingsMap = {
       ...defaultSettings,
       [item?.uid]: {
-        collectionName: defaultSettings[item?.uid]?.collectionName,
+        collectionName,
         seoChecks: {
           metaTitle,
           metaDescription,
@@ -81,20 +86,20 @@ export const SettingsModal = ({ item }) => {
       },
     };
 
-    setSettings(newSettings).then(async () => {
+    void setSettings(newSettings).then(async () => {
       setDefaultSettings(newSettings);
-      setIsVisible((prev) => !prev);
+      setIsOpen(false);
     });
 
-    // NEED LOCALE
     toggleNotification({
       type: 'success',
-      message: formatMessage({
-        id: 'notification.success.settings',
-        defaultMessage: `Settings saved for ${
-          defaultSettings[item?.uid]?.collectionName
-        } content-type.`,
-      }),
+      message: formatMessage(
+        {
+          id: getTrad('notification.success.settings'),
+          defaultMessage: 'Settings saved for {collectionName} content-type.',
+        },
+        { collectionName }
+      ),
     });
   };
 
@@ -103,14 +108,14 @@ export const SettingsModal = ({ item }) => {
       <Modal.Trigger>
         <Button variant="tertiary" startIcon={<Cog />} onClick={() => setupModalSettings()}>
           {formatMessage({
-            id: getTrad('SEOPage.info.config'),
+            id: getTrad('SEOPage.info.settings'),
             defaultMessage: 'Settings',
           })}
         </Button>
       </Modal.Trigger>
-      <Modal.Content labelledBy="title">
+      <Modal.Content>
         <Modal.Header>
-          <Typography fontWeight="bold" textColor="neutral800" as="h2" id="title">
+          <Typography fontWeight="bold" textColor="neutral800" tag="h2">
             {formatMessage({
               id: getTrad('SEOPage.info.settings'),
               defaultMessage: 'Settings',
@@ -118,10 +123,9 @@ export const SettingsModal = ({ item }) => {
           </Typography>
         </Modal.Header>
         <form
-          onSubmit={(event) => {
+          onSubmit={(event: React.FormEvent) => {
             handleSavingSettingsModal();
             setIsOpen(false);
-
             event.preventDefault();
           }}
         >
@@ -129,11 +133,11 @@ export const SettingsModal = ({ item }) => {
             <Box paddingBottom={4}>
               <ContentBox
                 title={formatMessage({
-                  id: 'Information',
+                  id: getTrad('Information'),
                   defaultMessage: 'Information',
                 })}
                 subtitle={formatMessage({
-                  id: getTrad('HomePage.info.settings.information'),
+                  id: getTrad('SEOPage.info.settings.information'),
                   defaultMessage: 'Disable SEO checks for this specific content-type.',
                 })}
                 icon={<Information />}
