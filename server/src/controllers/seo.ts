@@ -1,11 +1,13 @@
+import type { Context } from 'koa';
+
 export const seoController = {
-  findSeoComponent(ctx) {
+  findSeoComponent(ctx: Context) {
     ctx.body = strapi.plugin('seo').service('seo').getSeoComponent();
   },
-  findContentTypes(ctx) {
+  findContentTypes(ctx: Context) {
     ctx.body = strapi.plugin('seo').service('seo').getContentTypes();
   },
-  async createSeoComponent(ctx) {
+  async createSeoComponent(ctx: Context) {
     strapi.reload.isWatching = false;
 
     try {

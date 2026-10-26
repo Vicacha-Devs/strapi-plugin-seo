@@ -1,9 +1,11 @@
+import type { Core } from '@strapi/strapi';
 import _ from 'lodash';
 
 import seoContent from '../components/seo.json';
 import openGraph from '../components/open-graph.json';
+import type { ContentTypeSeoItem } from '../../../shared';
 
-export const seoService = ({ strapi }) => ({
+export const seoService = ({ strapi }: { strapi: Core.Strapi }) => ({
   getSeoComponent() {
     const seoComponent = strapi.components['shared.seo'];
     return seoComponent
@@ -16,9 +18,9 @@ export const seoService = ({ strapi }) => ({
 
     const blackListedPlugins = ['upload', 'i18n', 'users-permissions'];
 
-    let collectionTypes = [];
-    let singleTypes = [];
-    let plugins = [];
+    const collectionTypes: ContentTypeSeoItem[] = [];
+    const singleTypes: ContentTypeSeoItem[] = [];
+    const plugins: ContentTypeSeoItem[] = [];
 
     keys.forEach((name) => {
       const hasSharedSeoComponent = _.get(contentTypes[name], 'attributes.seo.component', null);
@@ -49,7 +51,7 @@ export const seoService = ({ strapi }) => ({
       }
     });
 
-    return { collectionTypes, singleTypes, plugins } || null;
+    return { collectionTypes, singleTypes, plugins };
   },
   async createSeoComponent() {
     const seoComponent = await this.getSeoComponent();

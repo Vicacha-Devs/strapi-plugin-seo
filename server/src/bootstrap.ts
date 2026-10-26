@@ -1,4 +1,6 @@
-const bootstrap = async ({ strapi }) => {
+import type { Core } from '@strapi/strapi';
+
+const bootstrap = async ({ strapi }: { strapi: Core.Strapi }) => {
   // Register permission actions.
   const actions = [
     {

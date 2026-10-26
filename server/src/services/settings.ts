@@ -1,4 +1,6 @@
-export const settingsService = ({ strapi }) => {
+import type { Core } from '@strapi/strapi';
+
+export const settingsService = ({ strapi }: { strapi: Core.Strapi }) => {
   const getPluginStore = () => {
     return strapi.store({
       environment: '',
